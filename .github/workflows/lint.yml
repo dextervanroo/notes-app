@@ -1,0 +1,35 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.3
+
+      - name: Install dependencies
+        run: poetry install --no-root --no-interaction
+
+      - name: black
+        run: poetry run black --check . --config pyproject.toml
+
+      - name: flake8
+        run: poetry run flake8 . --config .flake8
+
+      - name: isort
+        run: poetry run isort --check-only --settings-file pyproject.toml .
