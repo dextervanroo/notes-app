@@ -23,8 +23,6 @@ down:
 rebuild:
 	docker compose up -d --build
 
-logs:
-	docker compose logs -f backend
 
 # --- Frontend code quality and tests ---
 
@@ -44,6 +42,9 @@ frontend-test-cov:
 	docker compose exec frontend npm run test:coverage
 
 # --- Backend code quality and tests ---
+
+backend-logs:
+	docker compose logs -f backend
 
 backend-lint:
 	docker compose exec backend poetry run flake8 .
