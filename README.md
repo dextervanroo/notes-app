@@ -65,9 +65,9 @@ make createsuperuser
 
 ```bash
 # Backend
-make test                                                          # all tests
-make test ARGS="apps/notes/tests.py::TestCategoryList"            # single class
-make test ARGS="apps/notes/tests.py::TestCategoryList::test_list" # single test
+make backend-test                                                          # all tests
+make backend-test ARGS="apps/notes/tests.py::TestCategoryList"            # single class
+make backend-test ARGS="apps/notes/tests.py::TestCategoryList::test_list" # single test
 
 # Frontend
 make frontend-test   # vitest run with coverage table
@@ -76,8 +76,8 @@ make frontend-test   # vitest run with coverage table
 ### Linting
 
 ```bash
-make lint           # backend: flake8 + isort --check + black --check
-make format         # backend: isort + black (auto-fix)
+make backend-lint           # backend: flake8 + isort --check + black --check
+make backend-format         # backend: isort + black (auto-fix)
 make frontend-lint  # frontend: eslint src/
 ```
 

@@ -26,6 +26,8 @@ rebuild:
 logs:
 	docker compose logs -f backend
 
+# --- Frontend code quality and tests ---
+
 frontend-logs:
 	docker compose logs -f frontend
 
@@ -37,6 +39,26 @@ frontend-lint:
 
 frontend-test:
 	docker compose exec frontend npm run test
+
+frontend-test-cov:
+	docker compose exec frontend npm run test:coverage
+
+# --- Backend code quality and tests ---
+
+backend-lint:
+	docker compose exec backend poetry run flake8 .
+	docker compose exec backend poetry run isort --check-only .
+	docker compose exec backend poetry run black --check .
+
+backend-format:
+	docker compose exec backend poetry run isort .
+	docker compose exec backend poetry run black .
+
+backend-test:
+	docker compose exec backend poetry run pytest $(ARGS)
+
+backend-test-cov:
+	docker compose exec backend poetry run pytest --cov-report=html $(ARGS)
 
 # --- Django ---
 
@@ -51,22 +73,3 @@ createsuperuser:
 
 shell:
 	docker compose exec backend poetry run python manage.py shell
-
-# --- Code quality ---
-
-lint:
-	docker compose exec backend poetry run flake8 .
-	docker compose exec backend poetry run isort --check-only .
-	docker compose exec backend poetry run black --check .
-
-format:
-	docker compose exec backend poetry run isort .
-	docker compose exec backend poetry run black .
-
-# --- Tests ---
-
-test:
-	docker compose exec backend poetry run pytest $(ARGS)
-
-test-cov:
-	docker compose exec backend poetry run pytest --cov-report=html $(ARGS)
