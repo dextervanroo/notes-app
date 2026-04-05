@@ -1,12 +1,12 @@
 # Notes App
 
-A full-stack notes-taking application built with Django and Next.js.
+A full-stack note-taking application built with Django and Next.js.
 
 ---
 
 ## Project Overview
 
-A clean, minimal note-taking app where users can create, organize, and manage personal notes across color-coded categories. Features JWT authentication, a category sidebar, and an auto-saving note editor.
+A clean, minimal note-taking app where users can create, organize, and manage personal notes across color-coded categories. Features JWT authentication, a category sidebar, and a note editor with inline category creation.
 
 ---
 
@@ -17,10 +17,11 @@ A clean, minimal note-taking app where users can create, organize, and manage pe
 | Backend | Django 5 + Django REST Framework | Robust ORM, batteries-included auth, clean API patterns |
 | Auth | djangorestframework-simplejwt | Stateless JWT with built-in token refresh and blacklist |
 | Database | PostgreSQL 16 | Reliable relational DB; runs in Docker for local dev |
-| Frontend | Next.js 14 (App Router) + React | File-based routing, SSR-ready, strong TypeScript support |
-| Styling | Tailwind CSS | Utility-first, maps cleanly to Figma design tokens |
-| State | React Context | Built-in auth context; notes/categories are local component state |
-| HTTP Client | Native `fetch` | Built-in, no dependency needed; thin wrapper handles JWT headers |
+| CamelCase | djangorestframework-camel-case | Consistent camelCase JSON across all API responses |
+| Frontend | Next.js 16 (App Router) + React 19 | File-based routing, strong TypeScript support |
+| Styling | Tailwind CSS v4 | CSS-based config, utility-first, maps cleanly to design tokens |
+| HTTP Client | Native `fetch` | No extra dependency; thin wrapper handles JWT headers and auto-refresh |
+| FE Testing | Vitest + React Testing Library | ESM-native, fast, same API as Jest; RTL for component + interaction tests |
 | Orchestration | Docker Compose | Single command to spin up all services |
 
 ---
@@ -43,36 +44,48 @@ cp .env.example .env
 # Edit .env and set DJANGO_SECRET_KEY and POSTGRES_PASSWORD
 
 # 3. Start all services
-docker compose up --build
+make up
 
 # 4. Run migrations (first time only)
-docker compose exec backend poetry run python manage.py migrate
+make migrate
 
 # 5. (Optional) Create a Django superuser
-docker compose exec backend poetry run python manage.py createsuperuser
+make createsuperuser
 ```
 
-- Backend API: http://localhost:8000/api/
-- Django Admin: http://localhost:8000/admin/
-- Swagger UI: http://localhost:8000/swagger/
-- ReDoc: http://localhost:8000/redoc/
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000/ |
+| Backend API | http://localhost:8000/api/ |
+| Swagger UI | http://localhost:8000/swagger/ |
+| ReDoc | http://localhost:8000/redoc/ |
+| Django Admin | http://localhost:8000/admin/ |
 
 ### Running Tests
 
 ```bash
-docker compose exec backend poetry run pytest
+# Backend
+make test                                                          # all tests
+make test ARGS="apps/notes/tests.py::TestCategoryList"            # single class
+make test ARGS="apps/notes/tests.py::TestCategoryList::test_list" # single test
+
+# Frontend
+make frontend-test   # vitest run with coverage table
 ```
 
 ### Linting
 
 ```bash
-docker compose exec backend poetry run flake8 .
-docker compose exec backend poetry run black --check .
+make lint           # backend: flake8 + isort --check + black --check
+make format         # backend: isort + black (auto-fix)
+make frontend-lint  # frontend: eslint src/
 ```
 
 ---
 
 ## API Reference
+
+All responses are serialized as **camelCase** JSON.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -81,9 +94,9 @@ docker compose exec backend poetry run black --check .
 | POST | `/api/users/token/refresh/` | No | Refresh access token |
 | POST | `/api/users/logout/` | Yes | Blacklist refresh token |
 | GET | `/api/users/me/` | Yes | Get current user info |
-| GET/POST | `/api/notes/categories/` | Yes | List / create categories |
-| GET/PUT/PATCH | `/api/notes/categories/:id/` | Yes | Category detail (delete blocked) |
-| GET/POST | `/api/notes/` | Yes | List (supports `?category=`, `?sort=`) / create |
+| GET/POST | `/api/notes/categories/` | Yes | List (`?name=`, `?sort=`) / create categories |
+| GET/PUT/PATCH | `/api/notes/categories/:id/` | Yes | Category detail (delete blocked — 405) |
+| GET/POST | `/api/notes/` | Yes | List (`?category=`, `?sort=`) / create notes |
 | GET/PUT/PATCH/DELETE | `/api/notes/:id/` | Yes | Note detail |
 
 ### Authentication
@@ -98,54 +111,74 @@ All protected endpoints accept either:
 
 ```
 notes-app/
-├── backend/                    # Django project
+├── backend/
 │   ├── apps/
 │   │   ├── users/              # Custom User model (username + email), auth endpoints
 │   │   └── notes/              # Category and Note models, ViewSets, filters
 │   ├── config/
 │   │   ├── settings/           # Split settings: base, development, production
-│   │   ├── urls.py             # Root URLs + Swagger
+│   │   ├── urls.py
 │   │   └── wsgi.py
 │   ├── helpers/
 │   │   └── fields.py           # ColorField with random hex default
 │   ├── Dockerfile
-│   ├── pyproject.toml          # Poetry dependencies (incl. black + flake8)
+│   ├── pyproject.toml
 │   └── poetry.lock
-├── frontend/                   # Next.js project (to be implemented)
+├── frontend/
 │   ├── src/
-│   │   ├── app/                # App Router pages
-│   │   │   ├── (auth)/         # Login, Signup
-│   │   │   └── (app)/          # Protected: notes list + editor
-│   │   ├── components/         # UI components
-│   │   ├── lib/                # fetch wrapper, TypeScript types
-│   │   └── context/            # React AuthContext
-│   └── public/illustrations/   # SVG illustrations from design
+│   │   ├── app/
+│   │   │   ├── layout.tsx              # Root layout (fonts: Inter + Inria Serif)
+│   │   │   ├── globals.css             # Tailwind v4 + design tokens
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   └── (protected)/            # Auth-guarded route group
+│   │   │       ├── layout.tsx          # Redirects to /login if unauthenticated
+│   │   │       ├── page.tsx            # Dashboard: category sidebar + notes grid
+│   │   │       └── notes/
+│   │   │           ├── new/page.tsx    # Create note
+│   │   │           └── [id]/page.tsx   # View / edit / delete note
+│   │   ├── components/
+│   │   │   └── CategoryDialog.tsx      # Modal for creating a new category
+│   │   └── lib/
+│   │       └── api.ts                  # API client, TypeScript types, utilities
+│   ├── src/__tests__/                  # Vitest test suites
+│   │   ├── lib/api.test.ts             # Utility + token helper tests
+│   │   ├── components/                 # CategoryDialog tests
+│   │   └── app/                        # Page + interaction tests
+│   ├── public/images/                  # Illustrations (login, register)
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── vitest.config.ts
+│   └── eslint.config.mjs
+├── .github/workflows/lint.yml  # CI: backend lint + frontend lint + tests
 ├── docker-compose.yml
-├── .env.example
-└── README.md
+├── Makefile
+└── .env.example
 ```
 
 ---
 
 ## Design Decisions
 
-**React Context over Zustand** — Auth state is the only truly global state in the app. Notes and categories are fetched and held locally in the components that need them. A single `AuthContext` with `useState` covers the global needs without adding a dependency.
-
-**Native `fetch` over Axios** — No extra dependency needed. A thin `fetchApi()` wrapper handles JWT headers and 401 refresh logic.
+**Native `fetch` over Axios** — No extra dependency needed. The `apiFetch` wrapper in `api.ts` handles JWT headers and transparent token refresh on 401, then retries the original request.
 
 **localStorage for JWT tokens** — The backend and frontend run on different origins in development (`localhost:8000` vs `localhost:3000`). Cross-origin `httpOnly` cookies require `SameSite=None; Secure`, which means HTTPS even locally. For this project's scope, `localStorage` with short-lived access tokens (60 min) and automatic refresh is a pragmatic choice.
+
+**camelCase API responses** — `djangorestframework-camel-case` converts all JSON keys automatically, so the frontend can use idiomatic JavaScript naming (`createdAt`, `categoryId`) without any manual transformation.
 
 **Django apps under `apps/`** — Both `users` and `notes` live in `backend/apps/` to keep the project root clean. Each app is self-contained with its own models, serializers, ViewSets, filters, and URLs.
 
 **ViewSets + SimpleRouter** — Reduces view boilerplate; all CRUD routes are generated automatically. `CategoryViewSet.destroy` raises `MethodNotAllowed` to block deletion.
 
-**Random hex color per category** — Color is generated automatically via `ColorField`'s `default=random_hex_color` callable. It is read-only on the API — the client cannot set or change it.
+**Color per category** — Color is stored on the category (not the note). `ColorField` auto-generates a random hex if no color is supplied at creation; color is also writable via the API so clients can pick their own.
 
 **UUIDs as primary keys** — All models use `UUIDField(primary_key=True, default=uuid.uuid4)` to avoid enumerable integer IDs in URLs.
 
 **Username-based auth** — `USERNAME_FIELD = "username"` so both the Django admin and the API authenticate with username + password. Email is stored separately and must be unique.
 
-**No UI component library** — The design is custom enough that adopting shadcn/ui or MUI would require more overriding than building from scratch. Tailwind utility classes are sufficient to match the Figma design tokens.
+**No UI component library** — The design is custom; Tailwind CSS v4 utility classes are sufficient to match the Figma design tokens without the overhead of overriding a third-party library.
+
+**Named Docker volume for `node_modules`** — The frontend container mounts the source tree from the host, but `node_modules` lives in a named volume (`frontend_node_modules`). This prevents the host directory (empty or stale) from shadowing the container's packages.
 
 ---
 
@@ -155,21 +188,17 @@ This project was built with the assistance of **Claude Code (claude-sonnet-4-6)*
 
 **How AI was used:**
 
-- **Design analysis** — Claude Code read the Figma export screenshots directly and extracted the full UI specification: color palette, screen layouts, component hierarchy, and copy text. This replaced the need to manually document the Figma file.
+- **Design analysis** — Claude Code connected to Figma via MCP and extracted the full UI specification: color palette, screen layouts, component hierarchy, and copy text.
 
-- **Architecture planning** — Used Claude Code's plan mode to design the full project structure before writing a single line of code. The plan covered the Django model schema, REST API shape, Next.js route groups, auth flow, and Docker setup.
+- **Architecture planning** — Used Claude Code's plan mode to design the full project structure before writing code. The plan covered the Django model schema, REST API shape, Next.js route groups, auth flow, and Docker setup.
 
-- **Scaffolding** — Django project initialization, settings split, serializer boilerplate, ViewSet and filter structure were generated and reviewed iteratively.
+- **Scaffolding & implementation** — Backend and frontend code was written collaboratively: Claude generated initial implementations, which were reviewed and refined iteratively.
 
-- **Implementation** — Feature code (models, views, React components) was written collaboratively: Claude generated initial implementations, which were reviewed and refined.
-
-- **Reference codebase analysis** — Claude Code read settings, Docker, and view patterns from an existing production project (`hidros-backend`) and selectively applied relevant conventions (black/flake8 config, `apps/` folder structure, ViewSet pattern, `django-filter`, `drf-yasg`).
-
-- **README drafting** — This README was structured and written with Claude Code based on the challenge requirements and the decisions made during implementation.
+- **Reference codebase analysis** — Claude Code read settings, Docker, and view patterns from an existing production project (`hidros-backend`) and applied relevant conventions.
 
 **What required human judgment:**
-- Choosing localStorage vs. httpOnly cookies (weighed DX vs. security tradeoffs)
-- Deciding not to use a component library
+- Choosing localStorage vs. httpOnly cookies
+- Deciding not to use a UI component library
 - Deciding to move color ownership from Note to Category
 - Choosing username-based over email-based authentication
 - Reviewing all generated code for correctness and security

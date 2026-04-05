@@ -63,6 +63,7 @@ yarn-error.log*
 
 # Frontend misc
 .vercel
+**/coverage/**
 
 # TypeScript
 *.tsbuildinfo

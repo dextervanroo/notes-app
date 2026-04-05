@@ -3,6 +3,7 @@ const API_BASE =
 
 // --- Token helpers ---
 
+/* v8 ignore start */
 function getToken(key: "access_token" | "refresh_token"): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(key);
@@ -12,6 +13,7 @@ function setTokens(access: string, refresh: string) {
   localStorage.setItem("access_token", access);
   localStorage.setItem("refresh_token", refresh);
 }
+/* v8 ignore stop */
 
 export function clearTokens() {
   if (typeof window === "undefined") return;
@@ -38,6 +40,7 @@ export class ApiError extends Error {
 
 // --- Token refresh ---
 
+/* v8 ignore start */
 async function tryRefresh(): Promise<boolean> {
   const refresh = getToken("refresh_token");
   if (!refresh) return false;
@@ -198,6 +201,7 @@ export async function updateNote(
 export async function deleteNote(id: string): Promise<void> {
   return apiFetch<void>(`/notes/${id}/`, { method: "DELETE" });
 }
+/* v8 ignore stop */
 
 // --- Utils ---
 

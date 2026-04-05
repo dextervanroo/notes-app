@@ -1,4 +1,4 @@
-.PHONY: use-local use-production up down migrate shell createsuperuser lint format test test-cov frontend-logs frontend-install frontend-lint
+.PHONY: use-local use-production up down migrate shell createsuperuser lint format test test-cov frontend-logs frontend-install frontend-lint frontend-test
 
 # --- Environment switching ---
 
@@ -34,6 +34,9 @@ frontend-install:
 
 frontend-lint:
 	docker compose exec frontend npm run lint
+
+frontend-test:
+	docker compose exec frontend npm run test
 
 # --- Django ---
 
