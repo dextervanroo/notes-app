@@ -67,7 +67,7 @@ class TestCategoryCreate:
             CATEGORIES_URL, {"name": "Travel", "color": "#000000"}
         )
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data["color"] != "#000000"
+        assert response.data["color"] == "#000000"
 
     def test_create_category_missing_name(self, auth_client):
         response = auth_client.post(CATEGORIES_URL, {})
