@@ -1,4 +1,4 @@
-.PHONY: use-local use-production up down migrate shell createsuperuser lint format test
+.PHONY: use-local use-production up down migrate shell createsuperuser lint format test test-cov
 
 # --- Environment switching ---
 
@@ -55,3 +55,6 @@ format:
 
 test:
 	docker compose exec backend poetry run pytest
+
+test-cov:
+	docker compose exec backend poetry run pytest --cov-report=html

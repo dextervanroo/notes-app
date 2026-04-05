@@ -19,6 +19,7 @@ gunicorn = "^22.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest-django = "^4.8"
+pytest-cov = "^5.0"
 factory-boy = "^3.3"
 black = "^24.0"
 flake8 = "^7.0"
@@ -47,6 +48,14 @@ exclude = '''
 [tool.isort]
 profile = "black"
 skip = [".venv"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.testing"
+addopts = "--durations=10 -v --nomigrations --cov=apps --cov=helpers --cov-report=term-missing --cov-report=xml --cov-fail-under=90 -p no:warnings"
+python_files = ["tests.py", "test_*.py"]
+
+[tool.coverage.run]
+omit = ["*/migrations/*", "*/tests*", "conftest.py"]
 
 [build-system]
 requires = ["poetry-core"]
