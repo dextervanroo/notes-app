@@ -16,6 +16,8 @@ django-filter = "^24.0"
 drf-yasg = "^1.21"
 psycopg2-binary = "^2.9"
 gunicorn = "^22.0"
+djangorestframework-camel-case = "^1.4.2"
+django-extensions = "^4.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest-django = "^4.8"
@@ -24,6 +26,8 @@ factory-boy = "^3.3"
 black = "^24.0"
 flake8 = "^7.0"
 isort = "^5.13"
+ipython = ">=8.0,<9"
+django-silk = "^5.5.0"
 
 [tool.black]
 line-length = 88
