@@ -145,13 +145,13 @@ export async function getCategories(sort: string = "name"): Promise<Category[]> 
   qs.set("sort", sort);
   const query = `?${qs}`;
   const data = await apiFetch<Category[] | { results: Category[] }>(
-    `/notes/categories/${query}`,
+    `/categories/${query}`,
   );
   return Array.isArray(data) ? data : data.results;
 }
 
 export async function createCategory(name: string, color: string): Promise<Category> {
-  return apiFetch<Category>("/notes/categories/", {
+  return apiFetch<Category>("/categories/", {
     method: "POST",
     body: JSON.stringify({ name, color }),
   });

@@ -1,9 +1,15 @@
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import CategoryViewSet, NoteViewSet
 
-router = SimpleRouter()
-router.register(r"categories", CategoryViewSet, basename="category")
-router.register(r"", NoteViewSet, basename="note")
+notes_router = SimpleRouter()
+notes_router.register(r"", NoteViewSet, basename="note")
 
-urlpatterns = router.urls
+categories_router = SimpleRouter()
+categories_router.register(r"", CategoryViewSet, basename="category")
+
+urlpatterns = [
+    path("api/notes/", include(notes_router.urls)),
+    path("api/categories/", include(categories_router.urls)),
+]
