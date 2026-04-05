@@ -1,4 +1,4 @@
-.PHONY: use-local use-production up down migrate shell createsuperuser lint format test test-cov
+.PHONY: use-local use-production up down migrate shell createsuperuser lint format test test-cov frontend-logs frontend-install frontend-lint
 
 # --- Environment switching ---
 
@@ -25,6 +25,15 @@ rebuild:
 
 logs:
 	docker compose logs -f backend
+
+frontend-logs:
+	docker compose logs -f frontend
+
+frontend-install:
+	docker compose exec frontend npm install
+
+frontend-lint:
+	docker compose exec frontend npm run lint
 
 # --- Django ---
 
@@ -54,7 +63,7 @@ format:
 # --- Tests ---
 
 test:
-	docker compose exec backend poetry run pytest
+	docker compose exec backend poetry run pytest $(ARGS)
 
 test-cov:
-	docker compose exec backend poetry run pytest --cov-report=html
+	docker compose exec backend poetry run pytest --cov-report=html $(ARGS)
