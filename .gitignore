@@ -1,1 +1,35 @@
+# Environment configs
+venv/
+venv_locust/
+.venv/
+.env
+.envrc
+
+# Python stuff
+*__pycache__*
+*.prof
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/*
+profiling/*
+report-test.json
+
+# Mac weird files
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Claude Code
 .claude/
+
+# Misc
+
+*.todo
+.ipynb_checkpoints/*
+.idea/
+.tool-versions
+.devcontainer/
+coverage.xml
