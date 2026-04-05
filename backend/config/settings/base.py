@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_filters",
     "drf_yasg",
+    "django_extensions",
     # Local
     "apps.users",
     "apps.notes",

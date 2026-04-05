@@ -72,4 +72,4 @@ createsuperuser:
 	docker compose exec backend poetry run python manage.py createsuperuser
 
 shell:
-	docker compose exec backend poetry run python manage.py shell
+	docker compose exec backend poetry run python manage.py shell_plus
