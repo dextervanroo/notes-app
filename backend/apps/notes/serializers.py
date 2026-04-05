@@ -47,10 +47,9 @@ class NoteSerializer(serializers.ModelSerializer):
 
     def validate_category_id(self, value):
         request = self.context.get("request")
-        if request and not Category.objects.filter(
-            user=request.user, pk=value.pk
-        ).exists():
-            raise serializers.ValidationError(
-                "Invalid category."
-            )
+        if (
+            request
+            and not Category.objects.filter(user=request.user, pk=value.pk).exists()
+        ):
+            raise serializers.ValidationError("Invalid category.")
         return value

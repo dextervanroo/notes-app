@@ -162,38 +162,52 @@ class TestLogoutView:
 
 class TestUserFilter:
     def test_filter_by_email(self, db):
-        User.objects.create_user(username="alice", email="alice@example.com", password="p")
+        User.objects.create_user(
+            username="alice", email="alice@example.com", password="p"
+        )
         User.objects.create_user(username="bob", email="bob@example.com", password="p")
         f = UserFilter({"email": "alice"}, queryset=User.objects.all())
         assert f.qs.count() == 1
         assert f.qs.first().username == "alice"
 
     def test_filter_by_email_case_insensitive(self, db):
-        User.objects.create_user(username="alice", email="alice@example.com", password="p")
+        User.objects.create_user(
+            username="alice", email="alice@example.com", password="p"
+        )
         f = UserFilter({"email": "ALICE"}, queryset=User.objects.all())
         assert f.qs.count() == 1
 
     def test_filter_by_username(self, db):
-        User.objects.create_user(username="alice", email="alice@example.com", password="p")
+        User.objects.create_user(
+            username="alice", email="alice@example.com", password="p"
+        )
         User.objects.create_user(username="bob", email="bob@example.com", password="p")
         f = UserFilter({"username": "bob"}, queryset=User.objects.all())
         assert f.qs.count() == 1
         assert f.qs.first().username == "bob"
 
     def test_filter_by_username_partial(self, db):
-        User.objects.create_user(username="alice", email="alice@example.com", password="p")
+        User.objects.create_user(
+            username="alice", email="alice@example.com", password="p"
+        )
         User.objects.create_user(username="bob", email="bob@example.com", password="p")
         f = UserFilter({"username": "ali"}, queryset=User.objects.all())
         assert f.qs.count() == 1
 
     def test_filter_by_is_active(self, db):
-        User.objects.create_user(username="active", email="a@example.com", password="p", is_active=True)
-        User.objects.create_user(username="inactive", email="b@example.com", password="p", is_active=False)
+        User.objects.create_user(
+            username="active", email="a@example.com", password="p", is_active=True
+        )
+        User.objects.create_user(
+            username="inactive", email="b@example.com", password="p", is_active=False
+        )
         f = UserFilter({"is_active": True}, queryset=User.objects.all())
         assert all(u.is_active for u in f.qs)
 
     def test_no_filter_returns_all(self, db):
-        User.objects.create_user(username="alice", email="alice@example.com", password="p")
+        User.objects.create_user(
+            username="alice", email="alice@example.com", password="p"
+        )
         User.objects.create_user(username="bob", email="bob@example.com", password="p")
         f = UserFilter({}, queryset=User.objects.all())
         assert f.qs.count() == 2

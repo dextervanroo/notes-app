@@ -39,9 +39,7 @@ class TestCategoryList:
         assert len(response.data) == 1
         assert response.data[0]["name"] == "Work"
 
-    def test_does_not_return_other_users_categories(
-        self, auth_client, other_category
-    ):
+    def test_does_not_return_other_users_categories(self, auth_client, other_category):
         response = auth_client.get(CATEGORIES_URL)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 0
@@ -108,9 +106,7 @@ class TestCategoryDelete:
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
     def test_category_with_notes_protected_at_db_level(self, user, category):
-        Note.objects.create(
-            title="N", body="", category=category, user=user
-        )
+        Note.objects.create(title="N", body="", category=category, user=user)
         with pytest.raises(Exception):
             category.delete()
 
@@ -242,8 +238,12 @@ class TestNoteFilter:
         assert response.data[0]["title"] == "N1"
 
     def test_filter_by_title(self, auth_client, user, category):
-        Note.objects.create(title="Meeting notes", body="", category=category, user=user)
-        Note.objects.create(title="Shopping list", body="", category=category, user=user)
+        Note.objects.create(
+            title="Meeting notes", body="", category=category, user=user
+        )
+        Note.objects.create(
+            title="Shopping list", body="", category=category, user=user
+        )
         response = auth_client.get(NOTES_URL, {"title": "meeting"})
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
