@@ -92,6 +92,14 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
     ),
     "ORDERING_PARAM": "sort",
+    "DEFAULT_RENDERER_CLASSES": (
+        "djangorestframework_camel_case.render.CamelCaseJSONRenderer",
+    ),
+    "DEFAULT_PARSER_CLASSES": (
+        "djangorestframework_camel_case.parser.CamelCaseJSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ),
 }
 
 SWAGGER_SETTINGS = {
