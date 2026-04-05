@@ -1,4 +1,5 @@
 from django.db.models.functions import Lower
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.filters import OrderingFilter
@@ -24,7 +25,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
     filterset_class = CategoryFilter
-    filter_backends = [CaseInsensitiveOrderingFilter]
+    filter_backends = [DjangoFilterBackend, CaseInsensitiveOrderingFilter]
     search_fields = ["name"]
     ordering_fields = ["name", "created_at"]
     ordering = "name"

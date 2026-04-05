@@ -15,7 +15,8 @@ class CategoryFilter(filters.FilterSet):
 class NoteFilter(filters.FilterSet):
     category = filters.UUIDFilter(field_name="category__id")
     title = filters.CharFilter(lookup_expr="icontains")
+    body = filters.CharFilter(lookup_expr="icontains")
 
     class Meta:
         model = Note
-        fields = ["category", "title"]
+        fields = ["category", "title", "body"]

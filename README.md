@@ -83,7 +83,7 @@ docker compose exec backend poetry run black --check .
 | GET | `/api/users/me/` | Yes | Get current user info |
 | GET/POST | `/api/notes/categories/` | Yes | List / create categories |
 | GET/PUT/PATCH | `/api/notes/categories/:id/` | Yes | Category detail (delete blocked) |
-| GET/POST | `/api/notes/` | Yes | List (supports `?category=`, `?search=`, `?sort=`) / create |
+| GET/POST | `/api/notes/` | Yes | List (supports `?category=`, `?sort=`) / create |
 | GET/PUT/PATCH/DELETE | `/api/notes/:id/` | Yes | Note detail |
 
 ### Authentication

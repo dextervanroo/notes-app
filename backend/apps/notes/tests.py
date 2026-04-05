@@ -123,7 +123,7 @@ class TestCategoryFilter:
     def test_search_by_name(self, auth_client, user):
         Category.objects.create(name="Work", user=user)
         Category.objects.create(name="Travel", user=user)
-        response = auth_client.get(CATEGORIES_URL, {"search": "trav"})
+        response = auth_client.get(CATEGORIES_URL, {"name": "trav"})
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
@@ -250,10 +250,10 @@ class TestNoteFilter:
 
     def test_search_in_body(self, auth_client, user, category):
         Note.objects.create(
-            title="N1", body="important content", category=category, user=user
+            title="N1", body="Important content", category=category, user=user
         )
         Note.objects.create(title="N2", body="other", category=category, user=user)
-        response = auth_client.get(NOTES_URL, {"search": "important"})
+        response = auth_client.get(NOTES_URL, {"body": "import"})
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
 
