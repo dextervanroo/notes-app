@@ -5,7 +5,7 @@ from apps.notes.models import Category, Note
 
 pytestmark = pytest.mark.django_db
 
-CATEGORIES_URL = "/api/notes/categories/"
+CATEGORIES_URL = "/api/categories/"
 NOTES_URL = "/api/notes/"
 
 
