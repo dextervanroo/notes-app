@@ -7,10 +7,12 @@ import {
   updateNote,
   deleteNote,
   getCategories,
+  getMe,
   hexToRgba,
   formatFullDate,
   type Note,
   type Category,
+  type User,
 } from "@/lib/api";
 
 export default function NoteDetailPage() {
@@ -19,6 +21,7 @@ export default function NoteDetailPage() {
 
   const [note, setNote] = useState<Note | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -29,12 +32,14 @@ export default function NoteDetailPage() {
 
   const loadNote = useCallback(async () => {
     try {
-      const [noteData, catsData] = await Promise.all([
+      const [noteData, catsData, userData] = await Promise.all([
         getNote(id),
         getCategories(),
+        getMe(),
       ]);
       setNote(noteData);
       setCategories(catsData);
+      setCurrentUser(userData);
       setTitle(noteData.title);
       setBody(noteData.body);
       setCategoryId(noteData.category.id);
@@ -193,14 +198,16 @@ export default function NoteDetailPage() {
             >
               Edit
             </button>
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="h-[39px] px-6 rounded-[46px] border font-bold text-sm cursor-pointer disabled:opacity-50"
-              style={{ borderColor: "#c0392b", color: "#c0392b" }}
-            >
-              {deleting ? "Deleting…" : "Delete"}
-            </button>
+            {currentUser?.isSuperuser && (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="h-[39px] px-6 rounded-[46px] border font-bold text-sm cursor-pointer disabled:opacity-50"
+                style={{ borderColor: "#c0392b", color: "#c0392b" }}
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            )}
           </>
         )}
       </div>

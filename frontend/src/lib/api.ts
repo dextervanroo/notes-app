@@ -122,6 +122,14 @@ export async function register(data: {
 
 // --- Types ---
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  dateJoined: string;
+  isSuperuser: boolean;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -136,6 +144,12 @@ export interface Note {
   category: Category;
   createdAt: string;
   updatedAt: string;
+}
+
+// --- Users ---
+
+export async function getMe(): Promise<User> {
+  return apiFetch<User>("/users/me/");
 }
 
 // --- Categories ---

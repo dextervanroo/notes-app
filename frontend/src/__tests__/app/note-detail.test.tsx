@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api", () => ({
   getNote: vi.fn(),
   getCategories: vi.fn(),
+  getMe: vi.fn(),
   updateNote: vi.fn(),
   deleteNote: vi.fn(),
   hexToRgba: (_hex: string, alpha: number) => `rgba(0,0,0,${alpha})`,
@@ -45,6 +46,13 @@ describe("NoteDetailPage", () => {
     vi.mocked(useParams).mockReturnValue({ id: "note-123" });
     vi.mocked(api.getNote).mockResolvedValue(mockNote);
     vi.mocked(api.getCategories).mockResolvedValue([mockCategory]);
+    vi.mocked(api.getMe).mockResolvedValue({
+      id: "user-1",
+      username: "admin",
+      email: "admin@example.com",
+      dateJoined: "",
+      isSuperuser: true,
+    });
   });
 
   it("renders the note title and body", async () => {
@@ -135,6 +143,20 @@ describe("NoteDetailPage", () => {
     await user.click(screen.getByRole("button", { name: /delete/i }));
 
     expect(api.deleteNote).not.toHaveBeenCalled();
+  });
+
+  it("hides the Delete button for non-superusers", async () => {
+    vi.mocked(api.getMe).mockResolvedValue({
+      id: "user-2",
+      username: "regular",
+      email: "regular@example.com",
+      dateJoined: "",
+      isSuperuser: false,
+    });
+    render(<NoteDetailPage />);
+    await waitFor(() => screen.getByText("Test Note"));
+
+    expect(screen.queryByRole("button", { name: /delete/i })).not.toBeInTheDocument();
   });
 
   it("redirects to / when getNote fails", async () => {
