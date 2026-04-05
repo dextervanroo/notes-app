@@ -60,6 +60,7 @@ make createsuperuser
 | Swagger UI | http://localhost:8000/swagger/ |
 | ReDoc | http://localhost:8000/redoc/ |
 | Django Admin | http://localhost:8000/admin/ |
+| Silk Profiler | http://localhost:8000/silk/ (local only) |
 
 ### Running Tests
 
@@ -93,9 +94,9 @@ All responses are serialized as **camelCase** JSON.
 | POST | `/api/users/login/` | No | Log in, returns JWT pair |
 | POST | `/api/users/token/refresh/` | No | Refresh access token |
 | POST | `/api/users/logout/` | Yes | Blacklist refresh token |
-| GET | `/api/users/me/` | Yes | Get current user info |
-| GET/POST | `/api/notes/categories/` | Yes | List (`?name=`, `?sort=`) / create categories |
-| GET/PUT/PATCH | `/api/notes/categories/:id/` | Yes | Category detail (delete blocked — 405) |
+| GET | `/api/users/me/` | Yes | Get current user info (`isSuperuser` included) |
+| GET/POST | `/api/categories/` | Yes | List (`?name=`, `?sort=`) / create categories |
+| GET/PUT/PATCH | `/api/categories/:id/` | Yes | Category detail (delete blocked — 405) |
 | GET/POST | `/api/notes/` | Yes | List (`?category=`, `?sort=`) / create notes |
 | GET/PUT/PATCH/DELETE | `/api/notes/:id/` | Yes | Note detail |
 
