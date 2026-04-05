@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
 from drf_yasg import openapi
@@ -20,3 +21,6 @@ urlpatterns = [
     re_path(r"^swagger/$", schema_view.with_ui("swagger"), name="swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc"), name="redoc-ui"),
 ]
+
+if "silk" in settings.INSTALLED_APPS:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
