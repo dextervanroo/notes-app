@@ -11,7 +11,9 @@ body {
   font-family: var(--font-inter), sans-serif;
 }
 
-textarea,
-input {
-  font-family: inherit;
+@layer base {
+  textarea,
+  input {
+    font-family: inherit;
+  }
 }
