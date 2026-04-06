@@ -45,7 +45,7 @@ describe("NewNotePage", () => {
   it("renders the title and body inputs", async () => {
     render(<NewNotePage />);
     expect(screen.getByPlaceholderText("Note Title")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/start writing/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/pour your/i)).toBeInTheDocument();
   });
 
   it("loads and shows categories in the selector", async () => {
@@ -77,7 +77,7 @@ describe("NewNotePage", () => {
     await waitFor(() => screen.getByText("Work"));
 
     await user.type(screen.getByPlaceholderText("Note Title"), "My Note");
-    await user.type(screen.getByPlaceholderText(/start writing/i), "Body text");
+    await user.type(screen.getByPlaceholderText(/pour your/i), "Body text");
     await user.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
@@ -104,10 +104,36 @@ describe("NewNotePage", () => {
     });
   });
 
-  it("goes back when Cancel is clicked", async () => {
+  it("goes back without confirmation when Cancel is clicked on a blank form", async () => {
     const user = userEvent.setup();
     render(<NewNotePage />);
     await user.click(screen.getByRole("button", { name: /cancel/i }));
     expect(mockBack).toHaveBeenCalled();
+  });
+
+  it("prompts confirmation when Cancel is clicked with unsaved content and confirms", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const user = userEvent.setup();
+    render(<NewNotePage />);
+    await waitFor(() => screen.getByText("Work"));
+
+    await user.type(screen.getByPlaceholderText("Note Title"), "Draft");
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(window.confirm).toHaveBeenCalledWith("Discard this note? Your changes will be lost.");
+    expect(mockBack).toHaveBeenCalled();
+  });
+
+  it("stays on the page when Cancel confirmation is dismissed", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    const user = userEvent.setup();
+    render(<NewNotePage />);
+    await waitFor(() => screen.getByText("Work"));
+
+    await user.type(screen.getByPlaceholderText(/pour your/i), "Some body text");
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
   });
 });

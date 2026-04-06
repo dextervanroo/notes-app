@@ -86,6 +86,45 @@ describe("NoteDetailPage", () => {
     expect(mockReplace).toHaveBeenCalledWith("/");
   });
 
+  it("cancels edit without confirmation when nothing has changed", async () => {
+    const user = userEvent.setup();
+    render(<NoteDetailPage />);
+    await waitFor(() => screen.getByText("Test Note"));
+
+    await user.click(screen.getByRole("button", { name: /^edit$/i }));
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(screen.getByText("Test Note")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("Test Note")).not.toBeInTheDocument();
+  });
+
+  it("prompts confirmation when cancelling edit with unsaved changes and confirms", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const user = userEvent.setup();
+    render(<NoteDetailPage />);
+    await waitFor(() => screen.getByText("Test Note"));
+
+    await user.click(screen.getByRole("button", { name: /^edit$/i }));
+    await user.type(screen.getByDisplayValue("Test Note"), " edited");
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(window.confirm).toHaveBeenCalledWith("Discard changes? Your edits will be lost.");
+    expect(screen.getByText("Test Note")).toBeInTheDocument();
+  });
+
+  it("stays in edit mode when cancel confirmation is dismissed", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    const user = userEvent.setup();
+    render(<NoteDetailPage />);
+    await waitFor(() => screen.getByText("Test Note"));
+
+    await user.click(screen.getByRole("button", { name: /^edit$/i }));
+    await user.type(screen.getByDisplayValue("Test Note"), " edited");
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(screen.getByDisplayValue("Test Note edited")).toBeInTheDocument();
+  });
+
   it("switches to edit mode when Edit is clicked", async () => {
     const user = userEvent.setup();
     render(<NoteDetailPage />);

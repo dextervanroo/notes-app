@@ -70,6 +70,11 @@ export default function NoteDetailPage() {
 
   function handleCancelEdit() {
     if (!note) return;
+    const hasChanges =
+      title !== note.title ||
+      body !== note.body ||
+      categoryId !== note.category.id;
+    if (hasChanges && !confirm("Discard changes? Your edits will be lost.")) return;
     setTitle(note.title);
     setBody(note.body);
     setCategoryId(note.category.id);
