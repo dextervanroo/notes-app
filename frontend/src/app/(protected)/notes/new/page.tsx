@@ -82,7 +82,12 @@ export default function NewNotePage() {
         {error && <p className="text-xs text-red-600">{error}</p>}
 
         <button
-          onClick={() => router.back()}
+          onClick={() => {
+            if (title.trim() || body.trim()) {
+              if (!confirm("Discard this note? Your changes will be lost.")) return;
+            }
+            router.back();
+          }}
           className="h-[39px] px-6 rounded-[46px] border font-bold text-sm cursor-pointer"
           style={{ borderColor: "#957139", color: "#957139" }}
         >
@@ -118,7 +123,7 @@ export default function NewNotePage() {
             style={{ borderColor: "#957139", color: "#000" }}
           />
           <textarea
-            placeholder="Start writing your note…"
+            placeholder="Pour your heart out..."
             value={body}
             onChange={(e) => setBody(e.target.value)}
             className="flex-1 text-lg bg-transparent outline-none resize-none leading-relaxed"
