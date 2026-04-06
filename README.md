@@ -10,6 +10,24 @@ A clean, minimal note-taking app where users can create, organize, and manage pe
 
 ---
 
+## Process Summary
+
+1. **Design extraction** — Used Claude Code's Figma MCP integration to read the provided Figma file and extract the full UI specification: color palette, layout structure, component hierarchy, and screen-by-screen copy.
+
+2. **Architecture planning** — Before writing any code, used Claude Code's plan mode to design the full project structure: Django model schema, REST API shape, Next.js App Router layout, JWT auth flow, and Docker Compose setup.
+
+3. **Backend implementation** — Built the Django backend first: custom `User` model, `Category` and `Note` models with UUID PKs, DRF ViewSets with filtering/ordering, JWT auth endpoints, and a split settings system (`base` / `development` / `production`).
+
+4. **Frontend implementation** — Built the Next.js frontend against the running backend: auth pages (login/register), a protected dashboard with category sidebar, and note pages (create, view, edit) styled to match the Figma design.
+
+5. **Tooling & CI** — Added ESLint for the frontend, Black/flake8/isort for the backend, and a GitHub Actions workflow to run linting and tests on every push.
+
+6. **Testing** — Added Vitest + React Testing Library for the frontend (unit + interaction tests) and pytest-based tests for the backend, both with coverage reporting.
+
+7. **Iteration** — Refined features incrementally: multi-stage Docker builds, django-silk profiler for local dev, shell_plus for the Django shell, superuser-gated delete, and unsaved-changes confirmation dialogs.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology | Why |
